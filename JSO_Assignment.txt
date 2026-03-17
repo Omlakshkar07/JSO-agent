@@ -1,0 +1,422 @@
+
+JSO Phase-2: Agentic Career Intelligence
+Assignment Submission
+Agency Trust & Transparency Agent
+Submitted to: Aariyatech Corp Private Limited  |  JSO Phase-2 Evaluation
+
+PART A: CORE QUESTIONS
+
+Section 1 — Why Agentic JSO
+1.1  Why does the JSO platform require AI Agents in Phase-2?
+JSO Phase-1 built the essential foundation: a platform that stores job seeker profiles, agency listings, reviews, and placement data. But Phase-1 is fundamentally passive — it holds data and displays it, but it does not reason about it. A job seeker visiting the platform today sees a list of agencies and a set of star ratings, but receives no interpretation, no warning, and no guidance. A human expert looking at the same data could immediately spot patterns, inconsistencies, and risks. Phase-1 provides no such intelligence.
+Phase-2 requires AI Agents because the volume and complexity of platform interactions has grown beyond what manual human oversight can manage effectively. More critically, the nature of the decisions being made — which agency to trust, which candidate to shortlist — are high-stakes decisions that benefit enormously from intelligent, real-time analysis. An AI Agent does not just retrieve data; it reasons about data, detects patterns, weighs conflicting signals, and delivers an interpreted result that a user can act on immediately.
+Agents also enable the platform to shift from reactive to proactive. Instead of waiting for a user to ask a question, an agent can monitor incoming data and surface important information — an agency's trust score just dropped, a suspicious review pattern just appeared — before a user makes a decision based on stale information.
+
+1.2  What inefficiencies exist in the current Phase-1 system?
+Inefficiency
+Real-World Impact
+No trust interpretation layer
+Job seekers cannot distinguish reliable agencies from unreliable ones based on raw star ratings alone
+No fraud or manipulation detection
+Fake reviews, inflated ratings, and coordinated score manipulation go completely undetected
+Static data display
+A user sees a snapshot in time; if an agency's reputation changed last week, the platform gives no indication
+No cross-signal consistency checking
+An agency can have glowing reviews but a 10% placement success rate — Phase-1 displays both with no commentary on the contradiction
+No audience-aware information delivery
+A job seeker and a Super Admin see the same raw data, despite having completely different informational needs
+No proactive alerting
+Users must actively search for information; the platform never pushes critical insights to the right person at the right time
+
+1.3  How can AI Agents improve user experience and platform efficiency?
+AI Agents transform JSO from an information repository into an intelligence platform. For job seekers, an agent converts raw, unverified data into an interpreted trust profile — not 'this agency has 4.2 stars' but 'this agency has consistently placed candidates in roles matching your profile, with verified outcomes, and has no anomalous review activity.' That is a qualitatively different kind of value.
+For platform efficiency, agents eliminate the human bottleneck. Tasks that would require an administrator to manually review flagged agencies can be handled automatically, with human attention reserved for the edge cases that genuinely require judgment. Agents also enable continuous quality monitoring — the platform stays accurate and current without requiring manual intervention after every data update.
+Finally, AI Agents enable fairness at scale. An agent applies the same criteria to every agency, every time, without fatigue, bias in the human sense, or favouritism. This is critical for a platform whose mission is solving the global job search problem — that mission requires consistent, trustworthy information delivered equitably to every user.
+
+Section 2 — Agent Design
+2.1  What type of AI agent should be built?
+The proposed agent is a multi-step, tool-using, reasoning agent with both reactive and proactive operational modes. It is not a simple classifier or lookup system. Its defining characteristic is that it must make judgments — weighing conflicting signals, assessing data integrity, and constructing an explanation — rather than simply computing a fixed formula.
+
+Design Dimension
+Classification & Rationale
+Reactive vs Proactive
+Both. Reactive: evaluates an agency when queried by a user. Proactive: re-evaluates agencies on a schedule and when new data events are detected (new reviews, changed placement records).
+Single-step vs Multi-step
+Multi-step. The agent must retrieve data, assess its integrity, weigh signals, detect anomalies, construct a trust profile, and format audience-specific output. Each step depends on the previous.
+Tool usage
+Yes. The agent cannot reason from internal knowledge about specific agencies. It must retrieve live data from JSO's database using tools — queries against Supabase for reviews, placements, and ratings.
+Memory requirement
+Working memory within each evaluation run. Long-term memory of previous evaluation results, enabling the agent to detect score changes and flag trends.
+Single vs Multi-agent
+Logically two cooperating sub-agents: a Data Gathering sub-agent and a Reasoning & Scoring sub-agent. Separation enables independent auditability and improvement of each layer.
+
+2.2  What tasks will this agent automate?
+Continuous retrieval and aggregation of review text, feedback ratings, and placement success records for all registered agencies
+Triggered by: new review submitted, placement record updated, scheduled daily re-evaluation
+Signal integrity assessment — detecting manipulation patterns before any scoring begins
+Review velocity spikes, uniformity anomalies, cross-signal inconsistencies, account-age patterns of reviewers
+Trust profile construction — producing a multi-dimensional, confidence-scored trust assessment
+Not a single number. A structured profile: trust tier, confidence level, key strengths, key concerns, integrity notes
+Audience-aware output formatting — presenting the same underlying profile differently to different users
+Job seeker: simplified summary. HR Consultant: comparative benchmark. Admin: full data breakdown. Licensing: compliance report.
+Audit trail generation — logging every evaluation decision in an immutable, queryable record
+
+2.3  How will the agent interact with the existing dashboard?
+The agent does not replace the dashboard — it enriches it. Trust profiles are generated and stored in the database. The dashboard retrieves and renders them via API, with the presentation layer adapting to the authenticated user's role. The agent runs in the background; the dashboard surfaces its conclusions in context, at the moment a user needs them.
+On the User Dashboard, the Trust Profile card appears inline on every agency listing page. On the HR Consultant Dashboard, trust benchmarks appear within the consultant's own profile management view. On the Super Admin Dashboard, a dedicated Trust Intelligence panel provides full agent output with anomaly flags. On the Licensing Dashboard, the Trust Compliance Report is integrated into the license review workflow.
+
+Section 3 — Problem Solving
+3.1  What specific problem does this agent solve?
+Core Problem Statement
+Job seekers on JSO cannot distinguish between trustworthy and untrustworthy recruitment agencies. Without this capability, the platform's value proposition is undermined: every agency appears equally valid, and users must rely on chance or personal connections — the very inefficiency JSO was built to eliminate.
+
+The problem has three compounding dimensions. First, the information asymmetry: agencies know their own track record far better than any job seeker can. Second, the manipulation incentive: because trust signals affect agency visibility, there is a direct financial incentive to game reviews and ratings. Third, the interpretation gap: even honest data requires context to be meaningful — a 4.0 rating from 200 verified reviews is very different from a 4.0 rating from 5 reviews, but Phase-1 presents both identically.
+The Agency Trust & Transparency Agent solves all three dimensions simultaneously: it retrieves verified data, detects manipulation, and interprets signals in context — then communicates the result honestly, including when the result is unflattering to an agency.
+
+3.2  Real Scenario: How the Agent Improves the Platform
+Priya is a mid-level software engineer looking for a new role through JSO. She searches for agencies specialising in technology placements and finds three results: TechBridge Recruitment, QuickHire Solutions, and PeoplePath.
+Without the agent, Priya sees three sets of star ratings. QuickHire Solutions displays 4.8 stars — the highest of the three. She shortlists them and submits her profile.
+With the Agency Trust & Transparency Agent, here is what Priya sees instead:
+
+Agency
+Trust Profile (Agent Output)
+TechBridge Recruitment
+TRUST TIER: High | Confidence: High | 187 reviews over 3 years, consistent distribution. Placement success rate: 64%. Key strength: strong track record for mid-level engineering roles. Key concern: response time occasionally flagged in reviews.
+QuickHire Solutions
+TRUST TIER: Under Review | Confidence: Low | Note: 43 five-star reviews were submitted in a 72-hour window, all from accounts created within the past week. This pattern is inconsistent with natural review behaviour. Placement success rate: 11%. Assessment is based on verified signals only; anomalous reviews are excluded pending investigation.
+PeoplePath
+TRUST TIER: Insufficient Data | Confidence: N/A | Agency registered 3 weeks ago. 2 reviews available. A reliable assessment requires more data. Check back after 90 days or 20+ verified interactions.
+
+Priya immediately understands the landscape. She applies through TechBridge Recruitment. She does not apply through QuickHire Solutions — not because the agent told her not to, but because the agent gave her the truth and let her decide. This is the transparency principle in action.
+Meanwhile, on the Super Admin Dashboard, the QuickHire Solutions anomaly flag has been automatically escalated for human review. An administrator is notified without having had to manually monitor hundreds of agency listings.
+
+Section 4 — Dashboard Integration
+A. User Dashboard
+The Trust Profile card renders on every agency listing page, presented in plain language designed for a non-technical audience. It shows the trust tier as a clear label (High / Medium / Low / Under Review / Insufficient Data), a brief plain-English explanation of the key signals, and — critically — an honest disclosure whenever anomalous activity was detected. The card does not show a numerical score that could be mistaken for precision it does not have. It shows a judgment with a stated confidence level.
+Example — User Dashboard
+"QuickHire Solutions: Under Review. We detected an unusual pattern in this agency's recent reviews — a large number of reviews from new accounts submitted within a short period. This assessment reflects only verified signals. We recommend caution until further data is available."
+
+B. HR Consultant Dashboard
+HR Consultants see their own agency's trust profile alongside a platform benchmark: "Your agency's trust tier is Medium. The platform average for agencies with your tenure and volume of placements is High. Here are the three most frequently cited concerns in your recent feedback." This gives consultants actionable information to improve — without revealing competitor-specific data — and creates a positive feedback loop between consultant behaviour and trust score.
+
+C. Super Admin Dashboard
+Admins receive the full agent output: every data signal retrieved, the weight assigned to each signal, the complete anomaly detection log, the reasoning chain behind the final trust tier, and the full audit history. Admins can also override a trust tier, but every override requires a written reason and is logged permanently — the override does not erase the agent's original assessment, it sits alongside it. This preserves accountability: no trust verdict can be silently changed.
+
+D. Licensing Dashboard
+Agencies applying for or renewing platform licenses receive a Trust Compliance Report automatically generated by the agent. The report indicates whether the agency meets the minimum trust threshold for licensing, identifies any active integrity flags, and provides a structured summary that a licensing reviewer can use as the starting point for their decision. High-trust agencies with clean records can move through licensing efficiently; agencies with anomaly flags are automatically queued for deeper human review.
+
+Section 5 — Technical Architecture
+5.1  Architecture Overview
+The Agency Trust & Transparency Agent is built on Anthropic Claude Opus 4.6 as its core reasoning engine, chosen for its superior ability to understand context, reason about conflicting signals, and produce structured, explainable outputs in natural language. The architecture is layered across five logical tiers:
+
+┌─────────────────────────────────────────────────────────────────┐
+│                     PRESENTATION LAYER                          │
+│           Next.js / React  —  Four Dashboard Views              │
+└──────────────────────────┬──────────────────────────────────────┘
+                           │  REST API calls
+┌──────────────────────────▼──────────────────────────────────────┐
+│                    ORCHESTRATION LAYER                           │
+│       Node.js API  —  Agent trigger management & routing         │
+│       Event bus: new_review | placement_update | cron_daily      │
+└──────────────────────────┬──────────────────────────────────────┘
+                           │  Structured prompts + tool results
+┌──────────────────────────▼──────────────────────────────────────┐
+│                  LLM REASONING LAYER                             │
+│         Anthropic Claude Opus 4.6  —  Core reasoning engine      │
+│         Sub-agent A: Data integrity assessment                   │
+│         Sub-agent B: Trust profile construction & explanation    │
+└───────────────────┬──────────────────────────┬──────────────────┘
+                    │ Tool calls               │ Tool calls
+┌───────────────────▼──────┐      ┌────────────▼─────────────────┐
+│     DATA ACCESS LAYER    │      │     STORAGE & AUDIT LAYER     │
+│  Supabase: reviews,      │      │  Supabase: trust_profiles,    │
+│  placements, ratings,    │      │  evaluation_audit_log         │
+│  agency metadata         │      │  AWS S3: historical snapshots │
+└──────────────────────────┘      └──────────────────────────────┘
+
+5.2  Component Responsibilities
+Component
+Role in Agent Architecture
+Claude Opus 4.6 (Anthropic)
+Core reasoning: natural language review analysis, anomaly pattern recognition, signal weighting, trust profile synthesis, audience-aware explanation generation
+Node.js Orchestration Layer
+Manages agent lifecycle: triggers evaluations, sequences sub-agent calls, handles retries, routes outputs to correct dashboard endpoints
+Supabase (Data Layer)
+Stores agency data, reviews, placements, ratings, generated trust profiles, and the immutable evaluation audit log
+AWS S3 (Audit Storage)
+Long-term archival of historical trust profile snapshots, enabling trend analysis and regulatory audit trails
+Next.js / React (Frontend)
+Renders trust profile cards with audience-appropriate presentation; no business logic, pure display layer
+
+5.3  The Trust Profile Data Structure
+The agent produces a structured Trust Profile object for each agency evaluation. This is not a free-text narrative — it is a structured record that can be stored, versioned, audited, and rendered by any dashboard:
+TrustProfile {
+  agency_id:           string
+  evaluated_at:        timestamp
+  trust_tier:          'High' | 'Medium' | 'Low' | 'UnderReview' | 'InsufficientData'
+  confidence_level:    'High' | 'Medium' | 'Low'
+  key_strengths:       string[]   // plain-language bullet points
+  key_concerns:        string[]   // plain-language bullet points
+  integrity_flags:     IntegrityFlag[]
+  signal_summary: {
+    review_count:       number
+    review_period_days: number
+    placement_rate:     number | null
+    avg_feedback_score: number | null
+    anomalies_detected: boolean
+  }
+  previous_tier:       string | null   // enables change detection
+  explanation:         string          // human-readable reasoning
+  audience_summaries: {
+    job_seeker:   string,
+    hr_consultant: string,
+    admin:        string,
+    licensing:    string
+  }
+}
+
+Section 6 — Integration With Phase-1
+6.1  API Endpoints
+Endpoint
+Description
+POST /api/agent/evaluate/{agencyId}
+Triggers an on-demand trust evaluation for a specific agency. Returns a job ID; result is async.
+GET /api/agent/trust-profile/{agencyId}
+Returns the current trust profile for an agency, formatted for the requesting user's role.
+GET /api/agent/trust-profile/{agencyId}/audit
+Returns the full audit trail for all evaluations of an agency. Admin-role only.
+GET /api/agent/trust-profile/{agencyId}/history
+Returns the historical trend of trust tier changes over time.
+POST /api/agent/flag-override
+Admin-only. Overrides a trust tier with a mandatory written reason. Original assessment is preserved.
+
+6.2  Event Triggers and Data Flow
+The agent is not triggered only by user requests. Three categories of events initiate evaluations:
+New review submitted by a user — triggers incremental re-evaluation of the affected agency
+Placement record updated — triggers incremental re-evaluation
+Scheduled cron job (daily, 02:00 UTC) — triggers full re-evaluation of all active agencies
+The data flow for a typical on-demand evaluation:
+
+User opens agency profile on Next.js frontend
+        ↓
+Next.js calls GET /api/agent/trust-profile/{agencyId}
+        ↓
+Node.js checks: is the cached profile fresh (< 24 hours old)?
+        ↓                              ↓
+  YES → return cached profile    NO → trigger new evaluation
+                                        ↓
+                           Node.js queries Supabase for agency data
+                                        ↓
+                           PII stripped / anonymised before LLM call
+                                        ↓
+                           Claude Opus 4.6 Sub-agent A:
+                           Signal integrity assessment
+                                        ↓
+                           Claude Opus 4.6 Sub-agent B:
+                           Trust profile construction
+                                        ↓
+                           Result written to Supabase trust_profiles
+                           Evaluation logged to audit_log (immutable)
+                                        ↓
+                           Profile returned to Next.js, rendered on page
+
+6.3  Security Protocols (MCP / APA)
+All agent API endpoints require valid authenticated session tokens (Supabase Auth). Unauthenticated requests are rejected.
+Role-based access control: audit endpoints are restricted to admin roles. Consultant benchmark data is scoped to the consultant's own agency.
+PII anonymisation: before any data is sent to the Claude API, reviewer identifiers are stripped. The LLM reasons about patterns, not individuals.
+Immutable audit log: evaluation records are append-only. No evaluation can be deleted — only supplemented with an admin override note.
+Rate limiting: evaluation triggers are rate-limited per agency to prevent abuse (maximum one triggered evaluation per agency per 15-minute window).
+API key management: the Anthropic API key is stored as an environment secret (Vercel environment variables), never exposed in frontend code.
+
+Section 7 — Build Timeline
+Phase
+Activities & Deliverables
+Week 1 — Architecture Design
+Finalise data schema for TrustProfile and audit_log tables. Define all API contracts. Confirm data availability from existing Supabase instance. Align on PII anonymisation rules before any LLM integration begins.
+Weeks 2–3 — Data Layer & Integrity Agent
+Build the data retrieval pipeline from Supabase. Implement Sub-agent A: signal integrity assessment logic including review velocity detection, uniformity checks, and cross-signal consistency validation.
+Week 4 — Reasoning Agent
+Implement Sub-agent B: trust profile construction using Claude Opus 4.6. Build the audience-aware output formatting layer. Implement the Trust Profile data structure with all required fields.
+Week 5 — Dashboard Integration
+Integrate trust profile API with all four dashboards. Build the Trust Profile card UI component for the User Dashboard. Integrate admin override workflow into Super Admin Dashboard.
+Week 6 — Testing
+Unit tests for each agent step. Integration tests for the full evaluation pipeline. Adversarial tests: can the manipulation detection be bypassed? Load testing for the daily cron evaluation job.
+Week 7 — Staging Deployment
+Deploy to staging environment on Vercel. End-to-end UAT with representative users from each dashboard role. Collect feedback and iterate on explanation quality.
+Week 8 — Production Deployment
+Deploy to production. Set up monitoring and alerting for evaluation failures. Document runbook for admin override procedures. Review first two weeks of live data.
+
+
+PART B: MAIN TASK EXECUTION
+
+Agency Trust & Transparency Agent — Full Design
+Problem Statement
+The Problem We Are Solving
+Users of the JSO platform cannot determine which recruitment agencies are trustworthy. The current system displays raw reviews, ratings, and placement data but provides no interpretation, no anomaly detection, and no mechanism to distinguish authentic trust signals from manipulated ones. Job seekers make career-affecting decisions with incomplete and potentially misleading information.
+
+Agent Identity
+Property
+Value
+Agent Name
+Agency Trust Intelligence Agent (ATIA)
+Core Purpose
+Evaluate, explain, and honestly communicate the trustworthiness of recruitment agencies on JSO using multi-signal reasoning and manipulation detection
+Reasoning Engine
+Anthropic Claude Opus 4.6
+Operational Modes
+Reactive (on-demand per user query) and Proactive (event-triggered and scheduled re-evaluation)
+Output Format
+Structured Trust Profile with audience-specific explanations
+Guiding Principle
+Show users the truth — including when that truth is that an agency's reviews appear manipulated
+
+The Three Input Signals and Their Trust Weight
+The agent works with exactly three data signals available from JSO. Each signal has inherent strengths and vulnerabilities that determine how the agent weights it:
+
+Signal
+Strength
+Written Reviews
+Rich qualitative context; hard to fake at scale with consistent quality; sentiment can be cross-validated against ratings
+Placement Success Rate
+Most concrete outcome signal; if tracked by platform (not self-reported), nearly impossible to fake; directly measures real-world value delivered
+Feedback Ratings
+Easy to aggregate and compare; provides quantitative benchmark; most vulnerable to bulk manipulation
+
+Important Design Assumption
+Where placement success data is self-reported by agencies rather than independently verified by JSO's platform tracking, the agent assigns it reduced weight and explicitly notes this in the confidence assessment. Self-reported success is a useful signal but not a verified one. This assumption is stated openly so that as JSO's data infrastructure matures, the agent's reliability can improve alongside it.
+
+The Agent's Reasoning Flow — Step by Step
+Below is the complete reasoning flow the agent follows for every evaluation. Every step is deliberate; none can be skipped without degrading the integrity of the output.
+
+STEP 1: TRIGGER IDENTIFICATION
+  Identify: who is asking? (job seeker / consultant / admin / licensing)
+  Identify: why now? (user query / new review event / scheduled / override check)
+  → Determines output format and urgency of evaluation
+
+STEP 2: DATA RETRIEVAL
+  Query Supabase for: all reviews (text + rating + timestamp + reviewer account age)
+  Query Supabase for: placement success records (noting if self-reported or tracked)
+  Query Supabase for: feedback ratings history
+  Query Supabase for: agency account metadata (registration date, activity history)
+  Query audit log: previous trust profile (for change detection)
+  → Raw data package assembled for analysis
+
+STEP 3: SIGNAL INTEGRITY ASSESSMENT  [Sub-agent A]
+  Check A — Review velocity: are reviews arriving at a natural pace over time?
+  Check B — Rating uniformity: is the distribution of stars statistically natural?
+  Check C — Reviewer account age: are reviews from established or new accounts?
+  Check D — Cross-signal consistency: do reviews, ratings, and placements agree?
+  Check E — Sentiment vs rating alignment: does written text match the star given?
+  → Each suspicious signal is FLAGGED but NOT discarded
+  → Flagged signals receive reduced weight in Step 5
+  → Integrity flags are stored and surfaced to the user
+
+STEP 4: DATA SUFFICIENCY CHECK
+  Does the agent have enough data to make a meaningful judgment?
+  IF insufficient data → set tier to 'InsufficientData', stop, return honest explanation
+  IF sufficient data → proceed to Step 5
+  → Never produce a confident score on insufficient data
+
+STEP 5: SIGNAL WEIGHTING  [Sub-agent B begins]
+  Assign weight to each signal based on:
+    - Volume (more data = higher confidence)
+    - Recency (recent signals weighted higher than old ones)
+    - Integrity status (flagged signals receive reduced weight)
+    - Verification status (tracked placements > self-reported placements)
+  → Weighted signal set prepared for synthesis
+
+STEP 6: TRUST PROFILE SYNTHESIS
+  Claude Opus 4.6 reasons across weighted signals to determine:
+    - Trust tier (High / Medium / Low / UnderReview / InsufficientData)
+    - Confidence level (High / Medium / Low)
+    - Key strengths (what data genuinely supports)
+    - Key concerns (what data raises questions about)
+    - Plain-language explanation of the reasoning
+
+STEP 7: AUDIENCE-AWARE FORMATTING
+  Generate four versions of the explanation:
+    - Job Seeker: simple, actionable, no jargon
+    - HR Consultant: comparative context + improvement signals
+    - Super Admin: full data breakdown + all integrity flags
+    - Licensing: compliance-focused structured report
+
+STEP 8: RESULT STORAGE & AUDIT LOGGING
+  Write Trust Profile to Supabase (overwrites previous cached profile)
+  Append evaluation record to audit_log (immutable — never overwritten)
+  → Every decision traceable. Every output attributable.
+
+Manipulation Detection — Design Detail
+Because JSO currently has no fraud detection layer, manipulation detection is not an optional feature of this agent — it is a core responsibility. The agent must be skeptical of its own inputs before it reasons about them. Here is how each manipulation pattern is detected and handled:
+
+Manipulation Pattern
+Detection Method
+Review velocity spike (many reviews in a short period)
+Agent compares daily review arrival rate against the agency's historical average and the platform-wide average for similar agencies. A spike of 3x or more triggers a flag.
+Rating uniformity (suspiciously consistent scores)
+Agent checks the statistical distribution of star ratings. A natural distribution has variance. A dataset where 95%+ of ratings are identical is statistically anomalous and flagged.
+New-account reviewer concentration
+Agent checks reviewer account age metadata. If more than 40% of recent reviews come from accounts less than 30 days old, this is flagged as a potential coordinated campaign.
+Cross-signal inconsistency
+Agent compares review sentiment against placement success rate and feedback scores. An agency with 90% positive reviews and an 8% placement rate has a contradiction that cannot be resolved by averaging — it must be surfaced.
+Sentiment-rating mismatch
+Claude Opus 4.6 reads the written review text and infers the sentiment. If the inferred sentiment does not match the star rating given, this is individually anomalous and collectively significant if widespread.
+
+Transparency Rule for Manipulation Flags
+When the agent detects a manipulation pattern, it does NOT silently remove the suspicious reviews from the calculation and pretend they do not exist. It reduces their weight AND it tells the user exactly what it found. A job seeker seeing 'Unusual review activity detected' with an explanation is far better served than a job seeker seeing a clean 4.5-star rating that is built on manipulated data. Honesty is not optional — it is the product.
+
+Failure Modes and Safeguards
+Failure Mode
+Safeguard Built Into Design
+Cold start: new agency with no data
+Explicit 'InsufficientData' state with honest explanation. Never produce a confidence score the data cannot support.
+Confident wrongness: high confidence on skewed data
+Confidence level is a first-class field in the Trust Profile. It is always surfaced to users alongside the trust tier. Low confidence = stated explicitly.
+Staleness: cached profile reflects outdated reality
+Maximum cache age of 24 hours. Event-triggered re-evaluation on any new review or placement record. Change detection flags significant tier shifts.
+Gaming the detection logic: sophisticated manipulation that mimics natural patterns
+Multiple independent checks must all pass. A bad actor who defeats velocity detection still faces uniformity detection, cross-signal consistency, and sentiment analysis. The system requires simultaneous defeat of all checks.
+Admin bias: override mechanism used to favour agencies
+Every override is logged permanently with the admin's identity and stated reason. The original agent assessment is preserved alongside the override. Overrides are auditable at any time.
+
+
+PART C: ETHICAL & GOVERNANCE CONSIDERATIONS
+
+The following ethical pillars are not treated as a separate compliance checklist. They are woven into the agent's design. Each design decision made in Parts A and B was evaluated against these principles. This section makes that relationship explicit.
+
+Governance
+Transparency in AI decisions is achieved through three mechanisms. First, every Trust Profile includes a plain-language explanation of the reasoning — not just a verdict, but the evidence and logic behind it. Second, the immutable audit log means every evaluation is permanently traceable: who triggered it, what data was used, what conclusion was reached, and any overrides applied. Third, the agent never silently suppresses information — when anomalies are detected, they are surfaced.
+Accountability of platform operators is enforced through the override system. An admin can change a trust tier, but they cannot erase the agent's original assessment, and their override is permanently attributed to them with a required reason. This creates accountability without preventing legitimate human judgment.
+Alignment with JSO's mission: every design decision prioritises the job seeker's ability to make an informed decision. The agent exists to serve the person with the least information and the most at stake — the candidate.
+
+Workers
+The agent does not monitor HR consultants — it monitors agency-level aggregate signals. No individual consultant's behaviour is tracked or scored. The HR Consultant Dashboard view gives consultants visibility into their agency's trust profile and actionable feedback for improvement, creating a positive incentive rather than surveillance pressure.
+Recruitment agencies as contributors to the ecosystem are treated fairly: every agency is evaluated by the same criteria, no agency has privileged access to the scoring logic that others lack, and new agencies are given an honest 'Insufficient Data' status rather than a punitive low score for having no history.
+
+Community
+The agent is designed to promote inclusion in two ways. First, by making trust information equally available to all job seekers regardless of their personal networks or industry connections — the agent democratises information that previously only well-connected candidates could access informally. Second, the manipulation detection system specifically protects underrepresented job seekers, who are more likely to be harmed by misleading trust signals and less likely to have alternative information sources to fall back on.
+Fair hiring practices are supported by ensuring that trust profiles reflect actual placement outcomes and candidate experiences, not marketing or public relations efforts. An agency that genuinely serves diverse candidates well will have a trust profile that reflects that.
+
+Environment
+The agent is designed for computational efficiency. Evaluations are cached for 24 hours — the agent does not re-run a full LLM reasoning chain on every page load for every user. Event-triggered re-evaluations only fire when data actually changes, not on a fixed polling schedule. The daily full re-evaluation cron runs during off-peak hours to reduce infrastructure load during high-traffic periods.
+By building on Vercel (serverless) and Supabase (managed), the infrastructure scales down as well as up — compute is not provisioned for peak capacity and left idle. Historical snapshots are stored in AWS S3 with lifecycle policies that move old data to cold storage, reducing active compute and storage costs over time.
+
+Customers
+User data protection is enforced at the boundary between JSO's systems and the Anthropic API. Before any review text, placement record, or feedback data is sent to Claude Opus 4.6 for analysis, all personally identifiable information is stripped. The LLM reasons about patterns and signals, not about named individuals.
+CV content, interview transcripts, and consultation recordings are explicitly excluded from the agent's data scope. The agent works only with aggregate platform signals. This boundary is enforced at the API layer and documented in the data flow specification, so it can be audited.
+Ethical AI decision processes: the agent's trust tier labels (High, Medium, Low) are defined with explicit, documented criteria that do not change arbitrarily. An agency can understand what is required to improve their trust tier. The criteria are published on the platform. Opacity in the scoring logic would undermine the fairness the platform is built on.
+
+Sustainability
+The agent's design actively supports a fair hiring ecosystem. By making agency trust signals transparent and manipulation-resistant, the agent creates competitive pressure in the right direction: agencies improve their actual performance — placement rates, responsiveness, quality of matches — rather than their ability to game a rating system. This is the long-term flywheel the platform needs.
+For underserved communities, the agent provides something particularly valuable: a trustworthy guide in an ecosystem where informal networks have historically benefited those who already have access to them. A first-generation job seeker with no industry connections gets the same quality of trust intelligence as someone with twenty years of industry relationships.
+Responsible digital infrastructure means the platform's AI systems remain auditable, improvable, and honest about their limitations. The agent is designed to degrade gracefully — when it does not have enough data, it says so. When its confidence is low, it says so. A platform that admits uncertainty is a platform users can trust over time.
+
+
+Summary: What This Agent Is and What It Stands For
+The Core Design Philosophy
+The Agency Trust & Transparency Agent was designed around a single guiding principle: show users the truth, even when the truth is uncomfortable. An agent that hides manipulation signals to avoid conflict with agencies is not a trust agent — it is a liability. This agent earns user trust by being unconditionally honest about what it knows, what it does not know, and what it suspects.
+
+It is a multi-step reasoning system built on Anthropic Claude Opus 4.6, designed to interpret imperfect data with appropriate skepticism, detect manipulation with multiple independent checks, and communicate its findings in plain language to four different audiences with four different needs.
+It is designed to fail gracefully — acknowledging uncertainty, flagging anomalies, and preserving human oversight through the admin audit and override system. It does not claim to be infallible. It claims to be honest, transparent, and continuously improvable as JSO's data infrastructure matures.
+It respects workers by not surveilling individuals. It serves the community by democratising trust information. It protects customers by enforcing PII boundaries. It supports sustainability by rewarding genuine performance over manipulation. And it upholds governance by making every decision traceable and every override accountable.
+
+This is not a feature addition to JSO. It is a foundational shift in what the platform promises to its users: not just data, but truth.

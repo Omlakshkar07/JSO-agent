@@ -1,0 +1,37 @@
+# ─── Python ────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# ─── Environment ───────────────────────────
+.env
+.env.local
+.env.*.local
+
+# ─── Virtual Environment ──────────────────
+venv/
+.venv/
+env/
+
+# ─── IDE ──────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ─── Testing ──────────────────────────────
+.pytest_cache/
+htmlcov/
+.coverage
+coverage.xml
+
+# ─── Distribution ─────────────────────────
+dist/
+build/
+*.egg-info/
+
+# ─── OS ───────────────────────────────────
+.DS_Store
+Thumbs.db

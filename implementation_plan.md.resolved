@@ -1,0 +1,421 @@
+# ATIA Dashboard — Phase 1 Planning Document
+
+> [!IMPORTANT]
+> The previous `atia-dashboard/` directory no longer exists on disk.
+> Phase 2 will scaffold the entire Next.js project from scratch.
+
+---
+
+## Section 1: Codebase Analysis
+
+### 1.1 Current Frontend State
+
+**There are zero frontend source files.** The `d:\JSO assignment\atia-dashboard\` directory has been deleted. Phase 2 starts with `npx create-next-app`.
+
+### 1.2 Backend Files Analysed
+
+| File | Key Information Extracted |
+|---|---|
+| [outputs.py](file:///d:/JSO%20assignment/atia/models/outputs.py) | [TrustProfile](file:///d:/JSO%20assignment/atia/models/outputs.py#119-167) (19 fields), [IntegrityFlag](file:///d:/JSO%20assignment/atia/models/outputs.py#36-74) (7 fields), [SignalSummary](file:///d:/JSO%20assignment/atia/models/outputs.py#76-94) (13 fields), [AudienceSummaries](file:///d:/JSO%20assignment/atia/models/outputs.py#96-117) (4 fields), [AuditLogEntry](file:///d:/JSO%20assignment/atia/models/outputs.py#169-195) (17 fields), [TrustProfileResponse](file:///d:/JSO%20assignment/atia/models/outputs.py#197-210) (10 fields), [AnomalyQueueItem](file:///d:/JSO%20assignment/atia/models/outputs.py#233-241) (5 fields), [OverrideRequest](file:///d:/JSO%20assignment/atia/models/outputs.py#219-231) (2 fields) |
+| [internal.py](file:///d:/JSO%20assignment/atia/models/internal.py) | [WeightedSignal](file:///d:/JSO%20assignment/atia/models/internal.py#91-112) (6 fields — `signal_name`, `base_weight`, `adjusted_weight`, `final_weight`, `integrity_annotation`, `adjustments_applied`) |
+| [routes.py](file:///d:/JSO%20assignment/atia/api/routes.py) | 6 endpoints under `/api/v1/agent` (see §1.3) |
+| [constants.py](file:///d:/JSO%20assignment/atia/config/constants.py) | Trust tiers, confidence levels, roles, thresholds, base weights, platform averages |
+
+### 1.3 API Endpoints
+
+| Method | Path | Returns | Auth |
+|---|---|---|---|
+| `GET` | `/trust-profile/:agencyId` | [TrustProfileResponse](file:///d:/JSO%20assignment/atia/models/outputs.py#197-210) | Any |
+| `POST` | `/evaluate/:agencyId` | `{ job_id, estimated_completion_seconds }` | Admin |
+| `GET` | `/trust-profile/:agencyId/audit` | `{ agency_id, evaluations[] }` | Admin |
+| `POST` | `/override/:agencyId` | `{ message, audit_log_id }` | Admin |
+| `GET` | `/trust-profile/:agencyId/history` | `{ agency_id, history[] }` | Admin/Consultant |
+| `GET` | `/anomaly-queue` | `{ agencies[], total }` | Admin |
+
+### 1.4 Types the UI Will Use (from [outputs.py](file:///d:/JSO%20assignment/atia/models/outputs.py) + [internal.py](file:///d:/JSO%20assignment/atia/models/internal.py))
+
+[TrustProfile](file:///d:/JSO%20assignment/atia/models/outputs.py#119-167), [IntegrityFlag](file:///d:/JSO%20assignment/atia/models/outputs.py#36-74), [SignalSummary](file:///d:/JSO%20assignment/atia/models/outputs.py#76-94), [AudienceSummaries](file:///d:/JSO%20assignment/atia/models/outputs.py#96-117), [AuditLogEntry](file:///d:/JSO%20assignment/atia/models/outputs.py#169-195), [TrustProfileResponse](file:///d:/JSO%20assignment/atia/models/outputs.py#197-210), [AnomalyQueueItem](file:///d:/JSO%20assignment/atia/models/outputs.py#233-241), [OverrideRequest](file:///d:/JSO%20assignment/atia/models/outputs.py#219-231), [WeightedSignal](file:///d:/JSO%20assignment/atia/models/internal.py#91-112)
+
+**Derived types we must create (frontend only):**
+`TrustTier` (union), `ConfidenceLevel` (union), `FlagSeverity` (union), `RequestorRole` (union), `LicensingDecision` (union), `TierHistoryPoint`, `AuditEntry`, `AgencyInfo`, `MetricCardData`
+
+### 1.5 Platform Averages (from PRD + constants)
+
+| Metric | Value |
+|---|---|
+| Placement rate | 22% |
+| Avg star rating | 3.8 |
+| Avg feedback score | 3.5 |
+
+### 1.6 Potential Conflicts
+
+- **`data_is_stale`**: exists on [TrustProfileResponse](file:///d:/JSO%20assignment/atia/models/outputs.py#197-210) but NOT on [TrustProfile](file:///d:/JSO%20assignment/atia/models/outputs.py#119-167). Fixtures must include it.
+- **`explanation`**: exists on [TrustProfile](file:///d:/JSO%20assignment/atia/models/outputs.py#119-167) but NOT on [TrustProfileResponse](file:///d:/JSO%20assignment/atia/models/outputs.py#197-210). Admin panel uses full [TrustProfile](file:///d:/JSO%20assignment/atia/models/outputs.py#119-167) internally; response only has `summary`.
+- **`signal_summary`**: exists on [TrustProfile](file:///d:/JSO%20assignment/atia/models/outputs.py#119-167), not on [TrustProfileResponse](file:///d:/JSO%20assignment/atia/models/outputs.py#197-210). Fixtures must include it for metric cards.
+
+---
+
+## Section 2: What You Are Going to Build
+
+### Configuration & Utilities
+
+| # | Path | Description | Status |
+|---|---|---|---|
+| 1 | `tailwind.config.ts` | [NEW] Extend Tailwind with tier/flag/decision/neutral colour tokens |
+| 2 | `src/lib/tierUtils.ts` | [NEW] `getTierColor()`, `computeLicensingDecision()`, `getTierNumber()` |
+| 3 | `src/lib/formatters.ts` | [NEW] `formatPlacementRate()`, `formatDate()`, `formatStar()`, `formatDelta()` |
+| 4 | `src/lib/apiClient.ts` | [NEW] Central fetch wrapper with auth header injection |
+| 5 | [src/lib/agencyList.ts](file:///d:/JSO%20assignment/atia-dashboard/src/lib/agencyList.ts) | [NEW] Static agency list from fixture data |
+
+### Types & Data
+
+| # | Path | Description | Status |
+|---|---|---|---|
+| 6 | [src/types/index.ts](file:///d:/JSO%20assignment/atia-dashboard/src/types/index.ts) | [NEW] All TS types mirroring backend models + frontend-only derived types |
+| 7 | [src/test/data/trustProfiles.ts](file:///d:/JSO%20assignment/atia-dashboard/src/test/data/trustProfiles.ts) | [NEW] 6 fixture profiles covering all 5 tiers + stale state |
+| 8 | [src/test/data/auditTrail.ts](file:///d:/JSO%20assignment/atia-dashboard/src/test/data/auditTrail.ts) | [NEW] Audit trail per agency |
+| 9 | [src/test/data/tierHistory.ts](file:///d:/JSO%20assignment/atia-dashboard/src/test/data/tierHistory.ts) | [NEW] 12 data points per agency |
+| 10 | [src/test/data/weightedSignals.ts](file:///d:/JSO%20assignment/atia-dashboard/src/test/data/weightedSignals.ts) | [NEW] Weighted signals per agency |
+| 11 | `src/test/data/anomalyQueue.ts` | [NEW] Pre-built anomaly queue fixture |
+| 12 | [src/test/data/index.ts](file:///d:/JSO%20assignment/atia-dashboard/src/test/data/index.ts) | [NEW] Central export + `getFixture()` helpers |
+
+### Hooks (7 hooks)
+
+| # | Path | Description |
+|---|---|---|
+| 13 | `src/hooks/useAgencyList.ts` | [NEW] Returns all agencies with tier preview |
+| 14 | [src/hooks/useTrustProfile.ts](file:///d:/JSO%20assignment/atia-dashboard/src/hooks/useTrustProfile.ts) | [NEW] React Query — GET /trust-profile/:id |
+| 15 | `src/hooks/useAnomalyQueue.ts` | [NEW] React Query — GET /anomaly-queue |
+| 16 | `src/hooks/useTierHistory.ts` | [NEW] React Query — GET /trust-profile/:id/history |
+| 17 | `src/hooks/useAuditTrail.ts` | [NEW] React Query — GET /trust-profile/:id/audit |
+| 18 | `src/hooks/useEvaluate.ts` | [NEW] useMutation — POST /evaluate/:id |
+| 19 | `src/hooks/useOverride.ts` | [NEW] useMutation — POST /override/:id |
+
+### Primitive Components (6)
+
+| # | Path | Description |
+|---|---|---|
+| 20 | `src/components/primitives/TierBadge.tsx` | [NEW] Colour pill for any trust tier |
+| 21 | `src/components/primitives/ConfidenceBadge.tsx` | [NEW] Outline pill for confidence |
+| 22 | `src/components/primitives/LicensingDecisionBadge.tsx` | [NEW] PASS/REVIEW/FAIL badge |
+| 23 | `src/components/primitives/FlagSeverityBadge.tsx` | [NEW] P0/P1 badge |
+| 24 | `src/components/primitives/DeltaBadge.tsx` | [NEW] ▲+15.5% green / ▼-10.5% red |
+| 25 | `src/components/primitives/StalenessWarning.tsx` | [NEW] Amber banner if stale |
+
+### Shell Components (3 + layout)
+
+| # | Path | Description |
+|---|---|---|
+| 26 | `src/components/shell/Sidebar.tsx` | [NEW] Logo + nav + role card |
+| 27 | `src/components/shell/TopBar.tsx` | [NEW] Search + date + action + avatar |
+| 28 | `src/components/shell/RightPanel.tsx` | [NEW] Slide-in detail panel |
+| 29 | `src/app/dashboard/layout.tsx` | [NEW] Three-column shell |
+
+### Card Components (4)
+
+| # | Path | Description |
+|---|---|---|
+| 30 | `src/components/cards/MetricCard.tsx` | [NEW] Icon + number + delta + sub-label |
+| 31 | `src/components/cards/IntegrityFlagCard.tsx` | [NEW] Flag card with `showEvidence` |
+| 32 | `src/components/cards/AnomalyQueueRow.tsx` | [NEW] Single row in anomaly queue |
+| 33 | `src/components/cards/TrustCard.tsx` | [NEW] Full trust summary for seeker panel |
+
+### Chart Components (5)
+
+| # | Path | Description |
+|---|---|---|
+| 34 | `src/components/charts/TrustDonut.tsx` | [NEW] Donut — tier distribution |
+| 35 | `src/components/charts/TrustTierDistributionBar.tsx` | [NEW] Stacked horizontal bar |
+| 36 | `src/components/charts/BenchmarkBar.tsx` | [NEW] Agency vs platform comparison |
+| 37 | `src/components/charts/TierHistoryChart.tsx` | [NEW] Recharts LineChart |
+| 38 | `src/components/charts/PlatformHealthChart.tsx` | [NEW] Recharts AreaChart — stacked |
+
+### Table Components (2)
+
+| # | Path | Description |
+|---|---|---|
+| 39 | `src/components/tables/AgencyTable.tsx` | [NEW] Shared table — columns by role |
+| 40 | `src/components/tables/AuditTrailTable.tsx` | [NEW] Admin-only audit log table |
+
+### Form Components (1)
+
+| # | Path | Description |
+|---|---|---|
+| 41 | `src/components/forms/OverrideForm.tsx` | [NEW] Tier selector + reason + submit |
+
+### Role-specific Panels (4)
+
+| # | Path | Description |
+|---|---|---|
+| 42 | `src/components/panels/SeekerAgencyPanel.tsx` | [NEW] Right panel for seeker |
+| 43 | `src/components/panels/LicensingDecisionPanel.tsx` | [NEW] Right panel for licensing |
+| 44 | `src/components/panels/ConsultantProfilePanel.tsx` | [NEW] Right panel for consultant |
+| 45 | `src/components/panels/AdminAgencyPanel.tsx` | [NEW] Right panel for admin |
+
+### Pages (5)
+
+| # | Path | Description |
+|---|---|---|
+| 46 | [src/app/page.tsx](file:///d:/JSO%20assignment/atia-dashboard/src/app/page.tsx) | [NEW] Redirect → /dashboard/seeker |
+| 47 | [src/app/dashboard/seeker/page.tsx](file:///d:/JSO%20assignment/atia-dashboard/src/app/dashboard/seeker/page.tsx) | [NEW] Job Seeker dashboard |
+| 48 | [src/app/dashboard/licensing/page.tsx](file:///d:/JSO%20assignment/atia-dashboard/src/app/dashboard/licensing/page.tsx) | [NEW] Licensing dashboard |
+| 49 | [src/app/dashboard/consultant/page.tsx](file:///d:/JSO%20assignment/atia-dashboard/src/app/dashboard/consultant/page.tsx) | [NEW] HR Consultant dashboard |
+| 50 | [src/app/dashboard/admin/page.tsx](file:///d:/JSO%20assignment/atia-dashboard/src/app/dashboard/admin/page.tsx) | [NEW] Super Admin dashboard |
+
+**Total: 50 files to build**
+
+---
+
+## Section 3: Dashboard-by-Dashboard Field Plan
+
+### 3.1 — Job Seeker (`/dashboard/seeker`)
+
+**Metric Cards:**
+| Card | Field/Computation | Source |
+|---|---|---|
+| Total Agencies | `agencyList.length` | `useAgencyList()` |
+| Trusted Agencies | `profiles.filter(p => p.trust_tier === 'High' \|\| tier === 'Medium').length` | fixtures |
+| Under Review | `profiles.filter(p => p.trust_tier === 'UnderReview').length` | fixtures |
+| New This Month | `agencyList.filter(a => a.registered_days_ago < 30).length` | fixtures |
+
+**Main Chart:** `TrustTierDistributionBar` — horizontal stacked bar. X = % of agencies. Segments = 5 tiers. Labels show count inside each segment.
+
+**Table Columns:** Agency Name | Trust Tier (`TierBadge`) | Placement Rate (`formatPlacementRate(rate, 'job_seeker')`) | Reviews (`total_review_count`) | Last Updated (`formatDate(evaluated_at)`)
+
+**Right Panel (Widget 1):** `TrustDonut` — donut chart with 5 tier colours.
+**Right Panel (Widget 2):** `SeekerAgencyPanel` — agency name, tier badge, confidence badge, `audience_summaries.job_seeker`, key_strengths, key_concerns. P0 banner if applicable. No raw numbers.
+
+**User Flow:**
+1. Land → metric cards + distribution chart + agency table load
+2. Search → table filters client-side
+3. Click row → row highlights, right panel Widget 2 updates
+4. If `data_is_stale` → amber `StalenessWarning` below top bar
+
+### 3.2 — HR Consultant (`/dashboard/consultant`)
+
+**Metric Cards:**
+| Card | Field | Source |
+|---|---|---|
+| Your Trust Tier | `trust_tier` as large `TierBadge` | `useTrustProfile(myAgencyId)` |
+| Placement Rate | `signal_summary.placement_rate` + delta vs 22% | profile |
+| Avg Star Rating | `signal_summary.avg_star_rating_all_time` + delta vs 3.8 | profile |
+| Total Reviews | `signal_summary.total_review_count` + `reviews_last_30d` sub-label | profile |
+
+**Main Chart:** `TierHistoryChart` — LineChart. X = `evaluated_at`. Y = tier mapped to number (High=4 → InsufficientData=0). Custom tooltip shows tier name + date.
+
+**Content Below Chart:**
+- Two-column grid: "What's working" (key_strengths ✓) | "Areas to improve" (key_concerns !)
+- `BenchmarkBar` ×3: placement_rate vs 22%, star_rating vs 3.8, feedback vs 3.5
+
+**Right Panel Widget 1:** `ConsultantProfilePanel` — `audience_summaries.hr_consultant` + confidence + evaluated_at.
+**Right Panel Widget 2:** Data Health — progress bars toward High thresholds (75 reviews, 40% placement, 4.0 feedback).
+
+**Special States:**
+- `UnderReview` → hide all detail, show amber lockout card
+- `InsufficientData` → show "Getting started" checklist with progress
+
+**User Flow:**
+1. Land → auto-load own agency profile
+2. See metric cards + chart + strengths/concerns + benchmarks
+3. Click "Request Re-evaluation" → spinner → toast
+4. Profile refreshes after completion
+
+### 3.3 — Super Admin (`/dashboard/admin`)
+
+**Metric Cards:**
+| Card | Field | Source |
+|---|---|---|
+| Total Active Agencies | `agencyList.length` | fixtures |
+| Under Review | count with `trust_tier === 'UnderReview'` | fixtures |
+| Platform Avg Placement | mean of all `placement_rate` values | fixtures |
+| Active Integrity Flags | total P0 flag count across all agencies | fixtures |
+
+**Anomaly Queue:** Full-width amber section between metrics and chart. One row per agency with P0 flags. Columns: name | flag badges | flagged_since | "Review →" action.
+
+**Main Chart:** `PlatformHealthChart` — stacked AreaChart. X = last 30 days. Y = count of agencies per tier. Custom tooltip shows tier breakdown.
+
+**Table Columns:** Agency | Trust Tier | Confidence | Placement Rate | Flags (P0/P1 counts) | Trigger | Last Evaluated | Actions (Evaluate/Override)
+
+**Right Panel (400px when open):** Sections 1–6 as defined in prompt:
+1. Trust Profile Header (name, tier, confidence, evaluated_at, llm_model_version)
+2. Full Explanation (`explanation` text)
+3. Signal Weights (3 `SignalWeightBar` components)
+4. Integrity Flags (full evidence via `IntegrityFlagCard` with `showEvidence=true`)
+5. Audit Trail (`AuditTrailTable`)
+6. Override Form (`OverrideForm`)
+
+**User Flow:**
+1. Land → metrics → anomaly queue → health chart → agency table
+2. Click anomaly queue "Review →" → selects agency, scrolls to panel
+3. Click table row → right panel opens (Escape/click-outside closes)
+4. Browse full profile, flags, audit
+5. Apply override → toast + optimistic table update
+
+### 3.4 — Licensing (`/dashboard/licensing`)
+
+**Decision Logic (computed in UI):**
+```
+High or Medium + 0 P0 flags → PASS
+Low or any P0 flag → REVIEW_REQUIRED
+InsufficientData → FAIL
+```
+
+**Metric Cards:**
+| Card | Field | Source |
+|---|---|---|
+| PASS | count of PASS agencies | computed |
+| Review Required | count of REVIEW agencies | computed |
+| Fail | count of FAIL agencies | computed |
+| Pending Review | count with active P0 flags | computed |
+
+**Table Columns:** Agency Name | License Decision (`LicensingDecisionBadge`) | Trust Tier | Placement Rate | P0 Flags | Evaluated. Sort: FAIL → REVIEW → PASS.
+
+**Right Panel:**
+1. Decision badge (full-width)
+2. Threshold Checklist (5 rows: reviews ≥ 25, placement ≥ 20%, feedback ≥ 3.5, no P0 flags, sufficient data)
+3. `audience_summaries.licensing` text
+4. Active P0 flags (label + description only, NO evidence_summary)
+5. Export to PDF button
+
+**User Flow:**
+1. Land → metric cards + agency table sorted by decision
+2. Click row → right panel shows checklist + summary
+3. Print/export the decision report
+
+---
+
+## Section 4: Component Dependency Tree
+
+```
+TierBadge → []
+ConfidenceBadge → []
+LicensingDecisionBadge → []
+FlagSeverityBadge → []
+DeltaBadge → []
+StalenessWarning → []
+MetricCard → [DeltaBadge]
+IntegrityFlagCard → [FlagSeverityBadge]
+AnomalyQueueRow → [TierBadge, FlagSeverityBadge]
+TrustCard → [TierBadge, ConfidenceBadge]
+TrustDonut → [tierUtils]
+TrustTierDistributionBar → [tierUtils]
+BenchmarkBar → []
+TierHistoryChart → [tierUtils]
+PlatformHealthChart → [tierUtils]
+AgencyTable → [TierBadge, FlagSeverityBadge, DeltaBadge, LicensingDecisionBadge, formatters]
+AuditTrailTable → [TierBadge]
+OverrideForm → []
+SeekerAgencyPanel → [TrustCard, StalenessWarning]
+ConsultantProfilePanel → [ConfidenceBadge, BenchmarkBar]
+AdminAgencyPanel → [TierBadge, ConfidenceBadge, IntegrityFlagCard, SignalWeightBar, AuditTrailTable, OverrideForm]
+LicensingDecisionPanel → [LicensingDecisionBadge, IntegrityFlagCard]
+Sidebar → [tierUtils (role card)]
+TopBar → []
+RightPanel → [SeekerAgencyPanel, ConsultantProfilePanel, AdminAgencyPanel, LicensingDecisionPanel]
+dashboard/layout → [Sidebar, TopBar, RightPanel]
+seeker/page → [MetricCard, TrustTierDistributionBar, AgencyTable, TrustDonut, StalenessWarning]
+consultant/page → [MetricCard, TierHistoryChart, BenchmarkBar]
+admin/page → [MetricCard, AnomalyQueueRow, PlatformHealthChart, AgencyTable]
+licensing/page → [MetricCard, AgencyTable]
+```
+
+---
+
+## Section 5: Data Flow Diagram
+
+### Seeker
+```
+Page load → useAgencyList() → FIXTURES=true ? getFixture() : fetch(/trust-profile) 
+         → builds agencyProfiles[] → MetricCard receives counts
+         → TrustTierDistributionBar receives tier distribution
+         → AgencyTable receives sorted profile rows
+         → Row click → selectedAgencyId state → SeekerAgencyPanel receives profile
+```
+
+### Consultant
+```
+Page load → useTrustProfile(myAgencyId, 'hr_consultant')
+         → FIXTURES=true ? getFixture(id) : fetch(/trust-profile/:id)
+         → MetricCard receives signal_summary fields
+         → useTierHistory(myAgencyId) → TierHistoryChart receives history[]
+         → BenchmarkBar receives (agencyValue, platformAvg) tuples
+         → ConsultantProfilePanel receives audience_summaries.hr_consultant
+```
+
+### Admin
+```
+Page load → useAgencyList() → all profiles
+         → useAnomalyQueue() → AnomalyQueueRow[] rendered
+         → MetricCard receives platform-wide computed values
+         → PlatformHealthChart receives tier-per-day mock data
+         → AgencyTable receives all profiles
+         → Row click → selectedAgencyId → useTrustProfile(id, 'admin')
+         → useAuditTrail(id) → AdminAgencyPanel receives full data
+```
+
+### Licensing
+```
+Page load → useAgencyList() → all profiles
+         → computeLicensingDecision() maps each → PASS / REVIEW / FAIL
+         → MetricCard receives decision counts
+         → AgencyTable receives sorted by decision (FAIL first)
+         → Row click → LicensingDecisionPanel receives profile + decision
+```
+
+---
+
+## Section 6: Build Order
+
+| Step | Files | Count | Rationale |
+|---|---|---|---|
+| 0 | Next.js scaffold + deps | 1 | Everything depends on project existing |
+| 1 | `tailwind.config.ts`, [globals.css](file:///d:/JSO%20assignment/atia-dashboard/src/app/globals.css) | 2 | Colour tokens needed by every component |
+| 2 | [src/types/index.ts](file:///d:/JSO%20assignment/atia-dashboard/src/types/index.ts) | 1 | All code depends on types |
+| 3 | `src/test/data/*.ts` (5 fixture files + index) | 6 | Hooks depend on fixtures |
+| 4 | `src/lib/tierUtils.ts`, `formatters.ts`, `apiClient.ts`, [agencyList.ts](file:///d:/JSO%20assignment/atia-dashboard/src/lib/agencyList.ts) | 4 | Hooks + components need utils |
+| 5 | All 7 hooks | 7 | Components call hooks |
+| 6 | 6 primitive components | 6 | Cards/tables/panels compose primitives |
+| 7 | Shell (Sidebar + TopBar + RightPanel + layout) | 4 | Pages render inside the shell |
+| 8 | 4 card components | 4 | Pages + panels use cards |
+| 9 | 5 chart components | 5 | Pages embed charts |
+| 10 | 2 table components | 2 | Pages embed tables |
+| 11 | 1 form component (OverrideForm) | 1 | Admin panel embeds form |
+| 12 | 4 role-specific panels | 4 | RightPanel renders the correct panel |
+| 13 | 4 pages + root redirect | 5 | Final assembly |
+| 14 | Verification | — | Build + browser test all 4 dashboards |
+
+**Total: ~52 files across 15 steps**
+
+---
+
+## Section 7: Risk Register
+
+| # | Risk | Impact | Mitigation |
+|---|---|---|---|
+| R1 | `data_is_stale` exists on [TrustProfileResponse](file:///d:/JSO%20assignment/atia/models/outputs.py#197-210) but not on [TrustProfile](file:///d:/JSO%20assignment/atia/models/outputs.py#119-167). | Fixtures may miss it. | Add `data_is_stale: boolean` to fixture TrustProfile type. |
+| R2 | No `explanation` on [TrustProfileResponse](file:///d:/JSO%20assignment/atia/models/outputs.py#197-210) — only `summary`. | Admin panel needs `explanation` — full profile. | Fixtures store full [TrustProfile](file:///d:/JSO%20assignment/atia/models/outputs.py#119-167) with `explanation`. Admin hook returns full profile. |
+| R3 | `signal_summary` not on [TrustProfileResponse](file:///d:/JSO%20assignment/atia/models/outputs.py#197-210). | Metric cards need raw signal data. | Fixtures include `signal_summary`. Hooks serve full profile from fixtures. |
+| R4 | Platform averages (22%, 3.8, 3.5) are from the PRD but not in [constants.py](file:///d:/JSO%20assignment/atia/config/constants.py) as exported values. | Hardcoded in frontend. | Define `PLATFORM_AVERAGES` constant in [types/index.ts](file:///d:/JSO%20assignment/atia-dashboard/src/types/index.ts). |
+| R5 | `PlatformHealthChart` needs 30 days of tier-per-day data, but fixtures only have 12 history points per agency. | Chart data gap. | Generate synthetic 30-day platform data in fixtures. |
+| R6 | `agency_tenure_days` is on [SignalSummary](file:///d:/JSO%20assignment/atia/models/outputs.py#76-94) but no `registered_at` field in fixtures. | "New This Month" metric card needs registration date. | Add `registered_at` to `AgencyInfo` type and fixtures. |
+| R7 | React Query not currently in dependencies. | Hooks won't compile. | Install `@tanstack/react-query` in Step 0. |
+
+### Open Questions
+
+1. **Light theme confirmed?** — The Shopeers reference uses white cards on white background. The previous dark theme in [globals.css](file:///d:/JSO%20assignment/atia-dashboard/src/app/globals.css) is gone. Proceeding with light theme as shown in reference. ✅ Assumed YES.
+2. **`SignalWeightBar` is listed in the admin panel spec but not in the component list in Part E.** — I will create it as `src/components/charts/SignalWeightBar.tsx`. ✅ Resolved.
+
+---
+
+## Section 8: Confirmation Checklist
+
+- [ ] All 4 dashboards match your understanding
+- [ ] Component architecture (50 files) looks right
+- [ ] Build order makes sense (dependencies first)
+- [ ] Light theme (per Shopeers reference) is correct
+- [ ] All open questions in Section 7 are answered or accepted
+- [ ] Ready for Phase 2
+
+---
+
+**Plan complete. Review the sections above and reply "Plan approved. Begin Phase 2." to start building.**
